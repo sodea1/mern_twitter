@@ -1,3 +1,5 @@
+const passport = require('passport');
+
 const mongoose = require('mongoose');
 const express = require("express");
 const app = express();
@@ -8,6 +10,9 @@ const tweets = require("./routes/api/tweets");
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(passport.initialize()); // add middleware for passport
+require('./config/passport')(passport);
+
 
 mongoose
     .connect(db, { useNewUrlParser: true })
