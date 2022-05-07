@@ -14,7 +14,11 @@ mongoose
     .then(() => console.log("Connected to MongoDB successfully"))
     .catch(err => console.log(err));
 
-app.get("/", (req, res) => res.send("dmksaljf"));
+app.get("/", (req, res) => {
+    debugger;
+    res.send("Connection successful...");
+})
+
 app.use("/api/users", users);
 app.use("/api/tweets", tweets);
 
