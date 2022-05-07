@@ -35,11 +35,21 @@ router.post('/register', (req, res) => {
                     bcrypt.hash(newUser.password, salt, (err, hash) => {
                         if (err) throw err;
                         newUser.password = hash;
-                        newUser.save()
-                            .then(user => res.json(user))
+                        newUser
+                            .save()
+                            .then(user => {
+                                const payload = { id: user.id, handle: user.handle };
+
+                                jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
+                                    res.json({
+                                        success: true,
+                                        token: "Bearer " + token
+                                    });
+                                });
+                            })
                             .catch(err => console.log(err));
-                    })
-                })
+                    });
+                });
             }
         })
 })
@@ -64,20 +74,20 @@ router.post('/login', (req, res) => {
             bcrypt.compare(password, user.password)
                 .then(isMatch => {
                     if (isMatch) {
-                        // const payload = { id: user.id, handle: user.handle };
+                        const payload = { id: user.id, handle: user.handle };
 
-                        // jwt.sign(
-                        //     payload,
-                        //     keys.secretOrKey,
-                        //     // Tell the key to expire in one hour
-                        //     { expiresIn: 3600 },
-                        //     (err, token) => {
-                        //         res.json({
-                        //             success: true,
-                        //             token: 'Bearer ' + token
-                        //         });
-                        //     });
-                        res.json({ msg: 'Success' });
+                        jwt.sign(
+                            payload,
+                            keys.secretOrKey,
+                            // Tell the key to expire in one hour
+                            { expiresIn: 3600 },
+                            (err, token) => {
+                                res.json({
+                                    success: true,
+                                    token: 'Bearer ' + token
+                                });
+                            });
+                        // res.json({ msg: 'Success' });
                     } else {
                         errors.password = 'Incorrect password'
                         return res.status(400).json(errors);
